@@ -1,2 +1,5 @@
 requests
 dotenv (pip install python-dotenv)
+dotenv~=0.9.9
+python-dotenv~=1.1.0
+colorama~=0.4.6

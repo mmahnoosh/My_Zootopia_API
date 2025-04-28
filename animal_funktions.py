@@ -1,56 +1,26 @@
-import json
-
-
-def load_data(file_path):
-    """ Loads a JSON file
-        Args:
-            file_path (str): The path to the JSON file to be loaded.
-        Returns:
-            dict or list: The parsed JSON content, depending on the structure of the file.
-    """
-    with open(file_path, "r") as handle:
-        return json.load(handle)
-
-
-def get_animals_data():
-    """
-        Loads animal data from the default 'animals_data.json' file.
-        Returns:
-            list: A list of animal dictionaries loaded from the JSON file.
-    """
-    return load_data('animals_data.json')
-
-
 def serialize_animal(animal):
     """
-    Converts a single animal dictionary into an HTML list item string.
+    Serializes an animal dictionary into an HTML list item.
 
     Args:
-        animal (dict): A dictionary containing information about an animal.
-                       Expected keys include:
-                         - 'name' (str)
-                         - 'locations' (list of str, optional)
-                         - 'characteristics' (dict) with keys like 'diet', 'type',
-                           'skin_type', and 'top_speed'.
+        animal (dict): Contains 'name', optional 'locations', and 'characteristics' like 'diet', 'type', 'skin_type', and 'top_speed'.
 
     Returns:
-        str: A string of HTML markup representing the animal's information as a list item.
+        str: HTML string representing the animal.
     """
     locations_list = animal.get('locations', [])
     locations = ", ".join(locations_list) if isinstance(locations_list, list) else 'Unknown'
-    animal_type = animal['characteristics'].get('type', ' - ')
-    animal_skin_type = animal['characteristics'].get('skin_type', ' - ')
-    animal_top_speed = animal['characteristics'].get('top_speed', 'Unknown')
+    characteristics = animal.get('characteristics', {})
     return f"""
           <li class="cards__item">
               <div class="card__title">{animal['name']}</div>
               <div class="card__text">
                   <ul>
-                      <li><strong>Diet:</strong> {animal['characteristics']['diet']}</li>
+                      <li><strong>Diet:</strong> {characteristics.get('diet', ' - ')}</li>
                       <li><strong>Location:</strong> {locations}</li>
-                      <li><strong>Type:</strong> {animal_type}</li>
-                      <li><strong>skin_type:</strong> {animal_skin_type}</li>
-                      <li><strong>Top_speed:</strong> {animal_top_speed}</li>
+                      <li><strong>Type:</strong> {characteristics.get('type', ' - ')}</li>
+                      <li><strong>Skin type:</strong> {characteristics.get('skin_type', ' - ')}</li>
+                      <li><strong>Top speed:</strong> {characteristics.get('top_speed', 'Unknown')}</li>
 
                   </ul>    
               </div>
@@ -58,55 +28,107 @@ def serialize_animal(animal):
       """
 
 
-def filter_list(user_filter):
+def load_html_template(template_path='animals_template.html'):
     """
-    Filters a list of animals based on a given skin type and generates an HTML file.
+    Loads the contents of an HTML template file.
 
-    This function loads a dataset of animals and filters those whose skin type matches
-    the provided `user_filter`. It converts the filtered animals into HTML entries,
-    replaces a placeholder in an HTML template with these entries, and writes the
-    final content to a file named 'animals.html'.
+    Reads the specified HTML file (default: 'animals_template.html') using UTF-8 encoding
+    and returns its content as a string for further processing.
 
-    Parameters:
-        user_filter (str): The desired skin type to filter by (e.g., 'fur', 'scales', 'skin').
-                           If set to 'all', no filtering is applied and all animals are included.
-
-    """
-    animal_entries = []
-    animals_dataset = get_animals_data()
-    for animal in animals_dataset:
-        skin_type = animal.get('characteristics', {}).get('skin_type')
-        if skin_type == user_filter or user_filter == "all":
-            animal_entries.append(serialize_animal(animal))
-
-    animals_html = "\n".join(animal_entries)
-
-    with open('animals_template.html', 'r', encoding='utf-8') as f:
-        html_template = f.read()
-
-    final_html = html_template.replace("__REPLACE_ANIMALS_INFO__", animals_html)
-
-    with open('animals.html', 'w', encoding='utf-8') as f:
-        f.write(final_html)
-
-
-def show_skin_type():
-    """
-    Retrieves a set of unique skin types from the animal dataset.
-    This function accesses a dataset of animals, extracts the 'skin_type'
-    value from each animal's 'characteristics' (if present), and returns a set of all
-    unique skin types found.
+    Args:
+        template_path (str, optional): Path to the HTML template file. Defaults to 'animals_template.html'.
 
     Returns:
-        set: A set containing the unique skin types of all animals in the dataset.
+        str: The content of the HTML template.
     """
-    animal_skin_type = set()
-    animals_dataset = get_animals_data()
-    for animal in animals_dataset:
-        skin_type = animal.get('characteristics', {}).get('skin_type')
-        if skin_type:
-            animal_skin_type.add(skin_type)
-    return animal_skin_type
+
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return f.read()
 
 
+def write_html_file(content, output_path='animals.html'):
+    """
+    Writes HTML content to a file.
 
+    Saves the given content string into a file using UTF-8 encoding.
+    By default, it writes to 'animals.html', but a different output path can be provided.
+
+    Args:
+        content (str): The HTML content to write.
+        output_path (str, optional): Destination file path. Defaults to 'animals.html'.
+
+    Returns:
+        None
+    """
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+
+def generate_animal_html(data, user_input):
+    """
+    Generates HTML content for a list of animals.
+
+    Iterates over the provided animal data and serializes each animal into an HTML block.
+    If no animals are found, returns a message indicating no results for the user's input.
+
+    Args:
+        data (list): A list of animal dictionaries.
+        user_input (str): The user's search input, used for the 'no animals found' message.
+
+    Returns:
+        str: Generated HTML content as a string.
+    """
+    output = ""
+    for animal in data:
+        output += serialize_animal(animal)
+
+    if output == "":
+        return (f'<div class="card__title">No animals found for '
+                f'your search of "{user_input}".</div>')
+    return output
+
+
+def create_animal_html(data, user_input):
+    """
+    Generates HTML content from a list of animal data.
+
+    Iterates over the provided data, serializes each animal into HTML,
+    and returns the complete HTML content. If no animals are found,
+    a 'no animals found' message is returned instead.
+
+    Args:
+        data (list of dict): Animal data to generate the website content.
+        user_input (str): The user's input, used in the 'no animals found' message.
+
+    Returns:
+        str: Generated HTML content as a string.
+    """
+    output = ""
+
+    for animal_obj in data:
+        output += serialize_animal(animal_obj)
+
+    if output == "":
+        return (f'<div class="card__title">No animals found for '
+                f'your search of "{user_input}".</div>')
+    return output
+
+
+def replace_html(animal_data):
+    """
+    Replaces a placeholder in an HTML template with generated animal data.
+
+    Opens the 'animals_template.html' file, replaces the '__REPLACE_ANIMALS_INFO__'
+    placeholder with the provided animal HTML content, and returns the complete HTML code.
+
+    Args:
+        animal_data (str): Generated animal HTML content.
+
+    Returns:
+        str: Final HTML page content as a string.
+    """
+    with open("animals_template.html", "r") as f:
+        data = f.read()
+
+    new_data = data.replace("__REPLACE_ANIMALS_INFO__", animal_data)
+    return new_data

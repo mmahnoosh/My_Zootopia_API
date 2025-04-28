@@ -1,63 +1,44 @@
-from colorama import Fore, Style
+from colorama import Fore
+
 import animal_funktions
+import data_fetcher
 
 
 def get_user_input():
     """
-       Handles user input to either display all animals or filter them by skin type.
+    Prompts the user to enter the name of an animal.
 
-       This function prompts the user to choose between viewing all animals or filtering
-       them by a specific skin type. Based on the user's choice:
-         - If 'a' is selected, it calls the function to display all animals and exits.
-         - If 'f' is selected, it shows the available skin types, prompts for a filter value,
-           and displays the filtered list if the input is valid.
-         - If the user input is invalid (neither 'a' nor 'f', or an invalid skin type),
-           an appropriate error message is displayed, and the prompt repeats.
+    Displays a formatted header using the `colorama` library for better readability,
+    then waits for user input. The entered string is returned to the caller.
 
-       Uses color formatting via the `colorama` library for better console readability.
-       """
+    Returns:
+        str: The name of the animal entered by the user.
+    """
 
     print(Fore.LIGHTYELLOW_EX + "=================================== Animals"
                                 " ==========================================")
-    while True:
-        choice = input(
-            f"{Fore.GREEN} Do you want to see all animals or filter them? ({Fore.LIGHTYELLOW_EX}'a'"
-            f" {Fore.GREEN}for{Fore.LIGHTMAGENTA_EX} all{Fore.GREEN} or {Fore.LIGHTYELLOW_EX}'f' {Fore.GREEN}for{Fore.LIGHTMAGENTA_EX} filter{Fore.GREEN}): "
-            .strip().lower())
 
-        if choice == "a":
-            filter_value = "all"
-            animal_funktions.filter_list(filter_value)
-            #animal_funktions.show_animals()
-            exit()
-
-        elif choice == "f":
-            skin_types = animal_funktions.show_skin_type()
-            filter_value = input(
-                f"{Fore.LIGHTMAGENTA_EX}Which skin type would you like to see? "
-                f"{Fore.LIGHTYELLOW_EX}{skin_types}"
-            ).strip().capitalize()
-            if filter_value in skin_types:
-                animal_funktions.filter_list(filter_value)
-                exit()
-
-            else:
-                print(Fore.RED + "Invalid skin type. Please try again." + Style.RESET_ALL)
-
-        else:
-            print(Fore.RED + "Invalid input. Please enter 'a' or 'f'." + Style.RESET_ALL)
+    user_input = input("Enter the name of an animal: ")
+    return user_input
 
 
 def main():
     """
-        Generates the final HTML page by:
-        - Loading animal data from a JSON file
-        - Converting each animal into an HTML block
-        - Replacing a placeholder in the HTML template
-        - Saving the result to a new HTML file
-        """
+    Coordinates the generation of the final HTML page based on user input.
 
-    get_user_input()
+    Workflow:
+        - Prompts the user to enter the name of an animal.
+        - Loads corresponding animal data from a JSON file.
+        - Generates an HTML block for the animal.
+        - Replaces a placeholder in the HTML template with the generated content.
+        - Writes the final HTML to an output file.
+    """
+
+    user_input = get_user_input()
+    data = data_fetcher.fetch_data(user_input)
+    output = animal_funktions.generate_animal_html(data, user_input)
+    new_data = animal_funktions.replace_html(output)
+    animal_funktions.write_html_file(new_data)
 
 
 if __name__ == "__main__":
