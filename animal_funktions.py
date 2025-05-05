@@ -1,3 +1,6 @@
+from colorama import Fore
+
+
 def serialize_animal(animal):
     """
     Serializes an animal dictionary into an HTML list item.
@@ -81,37 +84,16 @@ def generate_animal_html(data, user_input):
     output = ""
     for animal in data:
         output += serialize_animal(animal)
+    separator = Fore.LIGHTYELLOW_EX + "=" * 87
+    print(separator)
 
-    if output == "":
-        return (f'<div class="card__title">No animals found for '
-                f'your search of "{user_input}".</div>')
-    return output
-
-
-def create_animal_html(data, user_input):
-    """
-    Generates HTML content from a list of animal data.
-
-    Iterates over the provided data, serializes each animal into HTML,
-    and returns the complete HTML content. If no animals are found,
-    a 'no animals found' message is returned instead.
-
-    Args:
-        data (list of dict): Animal data to generate the website content.
-        user_input (str): The user's input, used in the 'no animals found' message.
-
-    Returns:
-        str: Generated HTML content as a string.
-    """
-    output = ""
-
-    for animal_obj in data:
-        output += serialize_animal(animal_obj)
-
-    if output == "":
-        return (f'<div class="card__title">No animals found for '
-                f'your search of "{user_input}".</div>')
-    return output
+    if not output:
+        print(f"{Fore.LIGHTRED_EX}No animals matched your search for: \"{user_input}\".")
+        return (f'<div class="card__title">No animals matched your search for '
+                f'"{user_input}".</div>')
+    else:
+        print(f"{Fore.LIGHTMAGENTA_EX}Search results have been saved to animals.html.")
+        return output
 
 
 def replace_html(animal_data):

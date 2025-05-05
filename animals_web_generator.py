@@ -15,7 +15,7 @@ def get_user_input():
         str: The name of the animal entered by the user.
     """
 
-    print(Fore.LIGHTYELLOW_EX + "=================================== Animals"
+    print(Fore.LIGHTYELLOW_EX + "==================================== Animals"
                                 " ==========================================")
 
     user_input = input("Enter the name of an animal: ")

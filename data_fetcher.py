@@ -1,8 +1,7 @@
 import os
-
 import requests
 from dotenv import load_dotenv
-
+from colorama import Fore
 
 def fetch_data(animal_name):
     """
@@ -27,8 +26,8 @@ def fetch_data(animal_name):
         if response.status_code == requests.codes.ok:
             return response.json()
         else:
-            print(f"Error: {response.status_code} - {response.text}")
+            print(f"{Fore.LIGHTRED_EX}Error: {response.status_code} - {response.text}")
             return []
     except Exception as e:
-        print(f"Error: Something went wrong with the request. Exception: {e}")
+        print(f"{Fore.LIGHTRED_EX}Error: Something went wrong with the request. Exception: {e}")
         return []
