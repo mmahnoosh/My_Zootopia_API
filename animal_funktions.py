@@ -31,24 +31,6 @@ def serialize_animal(animal):
       """
 
 
-def load_html_template(template_path='animals_template.html'):
-    """
-    Loads the contents of an HTML template file.
-
-    Reads the specified HTML file (default: 'animals_template.html') using UTF-8 encoding
-    and returns its content as a string for further processing.
-
-    Args:
-        template_path (str, optional): Path to the HTML template file. Defaults to 'animals_template.html'.
-
-    Returns:
-        str: The content of the HTML template.
-    """
-
-    with open(template_path, 'r', encoding='utf-8') as f:
-        return f.read()
-
-
 def write_html_file(content, output_path='animals.html'):
     """
     Writes HTML content to a file.
@@ -96,12 +78,30 @@ def generate_animal_html(data, user_input):
         return output
 
 
+def load_html_template(template_path='animals_template.html'):
+    """
+    Loads the contents of an HTML template file.
+
+    Reads the specified HTML file (default: 'animals_template.html') using UTF-8 encoding
+    and returns its content as a string for further processing.
+
+    Args:
+        template_path (str, optional): Path to the HTML template file. Defaults to 'animals_template.html'.
+
+    Returns:
+        str: The content of the HTML template.
+    """
+
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return f.read()
+
+
 def replace_html(animal_data):
     """
     Replaces a placeholder in an HTML template with generated animal data.
 
-    Opens the 'animals_template.html' file, replaces the '__REPLACE_ANIMALS_INFO__'
-    placeholder with the provided animal HTML content, and returns the complete HTML code.
+    Uses the load_html_template function to read the template and replaces the
+    '__REPLACE_ANIMALS_INFO__' placeholder with the provided animal HTML content.
 
     Args:
         animal_data (str): Generated animal HTML content.
@@ -109,8 +109,6 @@ def replace_html(animal_data):
     Returns:
         str: Final HTML page content as a string.
     """
-    with open("animals_template.html", "r") as f:
-        data = f.read()
-
-    new_data = data.replace("__REPLACE_ANIMALS_INFO__", animal_data)
+    template = load_html_template()
+    new_data = template.replace("__REPLACE_ANIMALS_INFO__", animal_data)
     return new_data
